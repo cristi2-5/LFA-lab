@@ -1,0 +1,261 @@
+[states]
+# Stari initiale si de citire
+q_start S
+q_r_b1_is0 0
+q_r_b1_is1 0
+q_r_b2_b1is0_is0 0 # N1=00, capul pe #
+q_r_b2_b1is0_is1 0 # N1=01, capul pe #
+q_r_b2_b1is1_is0 0 # N1=10, capul pe #
+q_r_b2_b1is1_is1 0 # N1=11, capul pe #
+q_N1is00_ssep 0    # N1=00, capul pe c1
+q_N1is01_ssep 0    # N1=01, capul pe c1
+q_N1is10_ssep 0    # N1=10, capul pe c1
+q_N1is11_ssep 0    # N1=11, capul pe c1
+q_N1is00_rc1_is0 0 # N1=00, c1=0, capul pe c2
+q_N1is00_rc1_is1 0 # N1=00, c1=1, capul pe c2
+q_N1is01_rc1_is0 0 # N1=01, c1=0, capul pe c2
+q_N1is01_rc1_is1 0 # N1=01, c1=1, capul pe c2
+q_N1is10_rc1_is0 0 # N1=10, c1=0, capul pe c2
+q_N1is10_rc1_is1 0 # N1=10, c1=1, capul pe c2
+q_N1is11_rc1_is0 0 # N1=11, c1=0, capul pe c2
+q_N1is11_rc1_is1 0 # N1=11, c1=1, capul pe c2
+
+# Stari de decizie (dupa citirea tuturor celor 4 biti b1b2#c1c2)
+# Numele starii va fi q_N1val_N2val, ex: q_00_01 (N1=00, N2=01)
+q_00_00_decide 0
+q_00_01_decide 0
+q_00_10_decide 0
+q_00_11_decide 0
+q_01_00_decide 0 # Swap needed
+q_01_01_decide 0
+q_01_10_decide 0
+q_01_11_decide 0
+q_10_00_decide 0 # Swap needed
+q_10_01_decide 0 # Swap needed
+q_10_10_decide 0
+q_10_11_decide 0
+q_11_00_decide 0 # Swap needed
+q_11_01_decide 0 # Swap needed
+q_11_10_decide 0 # Swap needed
+q_11_11_decide 0
+
+# Stari pentru SWAP (Rescriere)
+# Format: s_N1orig_N2orig_write_Val_at_Pos_nextPos
+# Exemplu pentru N1=01, N2=00 (swap, devine 00#01) b1=0,b2=1, c1=0,c2=0
+s_01_00_gotoP0 0
+s_01_00_P0w0 0  # Scrie c1=0 la Pos0
+s_01_00_P1w0 0  # Scrie c2=0 la Pos1
+s_01_00_P3w0 0  # Scrie b1=0 la Pos3
+s_01_00_P4w1 0  # Scrie b2=1 la Pos4
+
+# Exemplu pentru N1=10, N2=00 (swap, devine 00#10) b1=1,b2=0, c1=0,c2=0
+s_10_00_gotoP0 0
+s_10_00_P0w0 0
+s_10_00_P1w0 0
+s_10_00_P3w1 0
+s_10_00_P4w0 0
+
+# Exemplu pentru N1=10, N2=01 (swap, devine 01#10) b1=1,b2=0, c1=0,c2=1
+s_10_01_gotoP0 0
+s_10_01_P0w0 0
+s_10_01_P1w1 0
+s_10_01_P3w1 0
+s_10_01_P4w0 0
+
+# Exemplu pentru N1=11, N2=00 (swap, devine 00#11) b1=1,b2=1, c1=0,c2=0
+s_11_00_gotoP0 0
+s_11_00_P0w0 0
+s_11_00_P1w0 0
+s_11_00_P3w1 0
+s_11_00_P4w1 0
+
+# Exemplu pentru N1=11, N2=01 (swap, devine 01#11) b1=1,b2=1, c1=0,c2=1
+s_11_01_gotoP0 0
+s_11_01_P0w0 0
+s_11_01_P1w1 0
+s_11_01_P3w1 0
+s_11_01_P4w1 0
+
+# Exemplu pentru N1=11, N2=10 (swap, devine 10#11) b1=1,b2=1, c1=1,c2=0
+s_11_10_gotoP0 0
+s_11_10_P0w1 0
+s_11_10_P1w0 0
+s_11_10_P3w1 0
+s_11_10_P4w1 0
+
+q_NoSwap_Halt 0 # Stare de oprire cand nu e nevoie de swap
+qF F            # Stare finala generala dupa swap
+
+[sigma]
+0
+1
+#
+_
+
+[rules]
+# === Pasul 1: Citeste b1 (pozitia 0) ===
+q_start 0 q_r_b1_is0 0 R
+q_start 1 q_r_b1_is1 1 R
+
+# === Pasul 2: Citeste b2 (pozitia 1), starea curenta retine valoarea lui b1 ===
+q_r_b1_is0 0 q_r_b2_b1is0_is0 0 R  # b1=0, b2=0 => N1=00
+q_r_b1_is0 1 q_r_b2_b1is0_is1 1 R  # b1=0, b2=1 => N1=01
+q_r_b1_is1 0 q_r_b2_b1is1_is0 0 R  # b1=1, b2=0 => N1=10
+q_r_b1_is1 1 q_r_b2_b1is1_is1 1 R  # b1=1, b2=1 => N1=11
+
+# === Pasul 3: Capul e pe b2 (pozitia 1). A scris b2, R -> capul pe '#' (pozitia 2). Sare peste '#' ===
+# Starea curenta retine N1. Trecem la starea _ssep (skipped separator), capul pe c1 (pozitia 3)
+q_r_b2_b1is0_is0 # q_N1is00_ssep # R  # N1=00
+q_r_b2_b1is0_is1 # q_N1is01_ssep # R  # N1=01
+q_r_b2_b1is1_is0 # q_N1is10_ssep # R  # N1=10
+q_r_b2_b1is1_is1 # q_N1is11_ssep # R  # N1=11
+
+# === Pasul 4: Capul e pe c1 (pozitia 3). Citeste c1. Starea retine N1. ===
+# Trecem la starea _rc1_isX (read c1 is X), capul pe c2 (pozitia 4)
+q_N1is00_ssep 0 q_N1is00_rc1_is0 0 R
+q_N1is00_ssep 1 q_N1is00_rc1_is1 1 R
+q_N1is01_ssep 0 q_N1is01_rc1_is0 0 R
+q_N1is01_ssep 1 q_N1is01_rc1_is1 1 R
+q_N1is10_ssep 0 q_N1is10_rc1_is0 0 R
+q_N1is10_ssep 1 q_N1is10_rc1_is1 1 R
+q_N1is11_ssep 0 q_N1is11_rc1_is0 0 R
+q_N1is11_ssep 1 q_N1is11_rc1_is1 1 R
+
+# === Pasul 5: Capul e pe c2 (pozitia 4). Citeste c2. Starea retine N1 si c1. ===
+# Trecem la starea de decizie q_N1val_N2val_decide. Capul ramane pe c2. Simbolul citit (c2) e scris la loc.
+q_N1is00_rc1_is0 0 q_00_00_decide 0 S
+q_N1is00_rc1_is0 1 q_00_01_decide 1 S
+q_N1is00_rc1_is1 0 q_00_10_decide 0 S
+q_N1is00_rc1_is1 1 q_00_11_decide 1 S
+
+q_N1is01_rc1_is0 0 q_01_00_decide 0 S # N1=01, N2=00
+q_N1is01_rc1_is0 1 q_01_01_decide 1 S
+q_N1is01_rc1_is1 0 q_01_10_decide 0 S
+q_N1is01_rc1_is1 1 q_01_11_decide 1 S
+
+q_N1is10_rc1_is0 0 q_10_00_decide 0 S # N1=10, N2=00
+q_N1is10_rc1_is0 1 q_10_01_decide 1 S # N1=10, N2=01
+q_N1is10_rc1_is1 0 q_10_10_decide 0 S
+q_N1is10_rc1_is1 1 q_10_11_decide 1 S
+
+q_N1is11_rc1_is0 0 q_11_00_decide 0 S # N1=11, N2=00
+q_N1is11_rc1_is0 1 q_11_01_decide 1 S # N1=11, N2=01
+q_N1is11_rc1_is1 0 q_11_10_decide 0 S # N1=11, N2=10
+q_N1is11_rc1_is1 1 q_11_11_decide 1 S
+
+# === Pasul 6: Stari de decizie. Capul e pe c2 (pozitia 4). Simbolul citit nu conteaza pt tranzitie. ===
+# Daca N1 <= N2, mergi la q_NoSwap_Halt
+q_00_00_decide 0 q_NoSwap_Halt 0 S
+q_00_00_decide 1 q_NoSwap_Halt 1 S
+q_00_01_decide 0 q_NoSwap_Halt 0 S
+q_00_01_decide 1 q_NoSwap_Halt 1 S
+q_00_10_decide 0 q_NoSwap_Halt 0 S
+q_00_10_decide 1 q_NoSwap_Halt 1 S
+q_00_11_decide 0 q_NoSwap_Halt 0 S
+q_00_11_decide 1 q_NoSwap_Halt 1 S
+
+# q_01_00_decide -> SWAP (N1=01, N2=00. b1=0,b2=1, c1=0,c2=0. Target: 00#01)
+q_01_00_decide 0 s_01_00_gotoP0 0 L # Citeste c2=0, muta L
+
+q_01_01_decide 0 q_NoSwap_Halt 0 S
+q_01_01_decide 1 q_NoSwap_Halt 1 S
+q_01_10_decide 0 q_NoSwap_Halt 0 S
+q_01_10_decide 1 q_NoSwap_Halt 1 S
+q_01_11_decide 0 q_NoSwap_Halt 0 S
+q_01_11_decide 1 q_NoSwap_Halt 1 S
+
+# q_10_00_decide -> SWAP (N1=10, N2=00. b1=1,b2=0, c1=0,c2=0. Target: 00#10)
+q_10_00_decide 0 s_10_00_gotoP0 0 L
+# q_10_01_decide -> SWAP (N1=10, N2=01. b1=1,b2=0, c1=0,c2=1. Target: 01#10)
+q_10_01_decide 1 s_10_01_gotoP0 1 L
+
+q_10_10_decide 0 q_NoSwap_Halt 0 S
+q_10_10_decide 1 q_NoSwap_Halt 1 S
+q_10_11_decide 0 q_NoSwap_Halt 0 S
+q_10_11_decide 1 q_NoSwap_Halt 1 S
+
+# q_11_00_decide -> SWAP (N1=11, N2=00. b1=1,b2=1, c1=0,c2=0. Target: 00#11)
+q_11_00_decide 0 s_11_00_gotoP0 0 L
+# q_11_01_decide -> SWAP (N1=11, N2=01. b1=1,b2=1, c1=0,c2=1. Target: 01#11)
+q_11_01_decide 1 s_11_01_gotoP0 1 L
+# q_11_10_decide -> SWAP (N1=11, N2=10. b1=1,b2=1, c1=1,c2=0. Target: 10#11)
+q_11_10_decide 0 s_11_10_gotoP0 0 L
+
+q_11_11_decide 0 q_NoSwap_Halt 0 S
+q_11_11_decide 1 q_NoSwap_Halt 1 S
+
+# Stare de oprire fara swap
+q_NoSwap_Halt 0 qF 0 S
+q_NoSwap_Halt 1 qF 1 S
+q_NoSwap_Halt # qF # S
+q_NoSwap_Halt _ qF _ S
+
+# === Secvente de SWAP ===
+# Fiecare secventa de swap: merge la P0, scrie c1, merge P1, scrie c2, merge P3, scrie b1, merge P4, scrie b2, Halt.
+# Simbolurile citite in timpul navigarii nu schimba valorile de scris (ele sunt in numele starii).
+
+# Swap pentru N1=01, N2=00. (b1=0,b2=1, c1=0,c2=0). Target: 00#01
+s_01_00_gotoP0 0 s_01_00_gotoP0 0 L  # de la c2(P4) la c1(P3)
+s_01_00_gotoP0 # s_01_00_gotoP0 # L  # de la c1(P3) la sep(P2)
+s_01_00_gotoP0 1 s_01_00_gotoP0 1 L  # de la sep(P2) la b2(P1)
+s_01_00_gotoP0 0 s_01_00_P0w0 0 L  # de la b2(P1) la b1(P0), pregatit sa scrie c1=0 la P0
+s_01_00_P0w0 0 s_01_00_P1w0 0 R  # Scris c1=0 la P0. Capul la P1. Pregatit sa scrie c2=0.
+s_01_00_P1w0 1 s_01_00_P3w0 0 R  # Scris c2=0 la P1. Capul la P2(#). Pregatit sa scrie b1=0 la P3. (trebuie R din nou)
+s_01_00_P3w0 # s_01_00_P3w0_sep # R # Trecut de P2(#). Capul la P3. Pregatit sa scrie b1=0.
+s_01_00_P3w0_sep 0 s_01_00_P4w1 0 R # Scris b1=0 la P3. Capul la P4. Pregatit sa scrie b2=1.
+s_01_00_P4w1 0 qF 1 S          # Scris b2=1 la P4. Halt.
+
+# Swap pentru N1=10, N2=00. (b1=1,b2=0, c1=0,c2=0). Target: 00#10
+s_10_00_gotoP0 0 s_10_00_gotoP0 0 L
+s_10_00_gotoP0 # s_10_00_gotoP0 # L
+s_10_00_gotoP0 0 s_10_00_gotoP0 0 L
+s_10_00_gotoP0 1 s_10_00_P0w0 1 L
+s_10_00_P0w0 1 s_10_00_P1w0 0 R
+s_10_00_P1w0 0 s_10_00_P3w1 0 R
+s_10_00_P3w1 # s_10_00_P3w1_sep # R
+s_10_00_P3w1_sep 0 s_10_00_P4w0 1 R
+s_10_00_P4w0 0 qF 0 S
+
+# Swap pentru N1=10, N2=01. (b1=1,b2=0, c1=0,c2=1). Target: 01#10
+s_10_01_gotoP0 1 s_10_01_gotoP0 1 L # de la c2(P4)=1 la c1(P3)=0
+s_10_01_gotoP0 0 s_10_01_gotoP0 0 L # de la c1(P3)=0 la sep(P2)=#
+s_10_01_gotoP0 # s_10_01_gotoP0 # L # de la sep(P2)=# la b2(P1)=0
+s_10_01_gotoP0 0 s_10_01_P0w0 0 L # de la b2(P1)=0 la b1(P0)=1
+s_10_01_P0w0 1 s_10_01_P1w1 0 R  # P0=c1(0). Scrie 0. Cap P1.
+s_10_01_P1w1 0 s_10_01_P3w1 1 R  # P1=c2(1). Scrie 1. Cap P2(#).
+s_10_01_P3w1 # s_10_01_P3w1_sep # R # Cap P3.
+s_10_01_P3w1_sep 0 s_10_01_P4w0 1 R # P3=b1(1). Scrie 1. Cap P4.
+s_10_01_P4w0 1 qF 0 S          # P4=b2(0). Scrie 0. Halt.
+
+# Swap pentru N1=11, N2=00. (b1=1,b2=1, c1=0,c2=0). Target: 00#11
+s_11_00_gotoP0 0 s_11_00_gotoP0 0 L
+s_11_00_gotoP0 0 s_11_00_gotoP0 0 L
+s_11_00_gotoP0 # s_11_00_gotoP0 # L
+s_11_00_gotoP0 1 s_11_00_P0w0 1 L
+s_11_00_P0w0 1 s_11_00_P1w0 0 R
+s_11_00_P1w0 1 s_11_00_P3w1 0 R
+s_11_00_P3w1 # s_11_00_P3w1_sep # R
+s_11_00_P3w1_sep 0 s_11_00_P4w1 1 R
+s_11_00_P4w1 0 qF 1 S
+
+# Swap pentru N1=11, N2=01. (b1=1,b2=1, c1=0,c2=1). Target: 01#11
+s_11_01_gotoP0 1 s_11_01_gotoP0 1 L
+s_11_01_gotoP0 0 s_11_01_gotoP0 0 L
+s_11_01_gotoP0 # s_11_01_gotoP0 # L
+s_11_01_gotoP0 1 s_11_01_P0w0 1 L
+s_11_01_P0w0 1 s_11_01_P1w1 0 R
+s_11_01_P1w1 1 s_11_01_P3w1 1 R
+s_11_01_P3w1 # s_11_01_P3w1_sep # R
+s_11_01_P3w1_sep 0 s_11_01_P4w1 1 R
+s_11_01_P4w1 1 qF 1 S
+
+# Swap pentru N1=11, N2=10. (b1=1,b2=1, c1=1,c2=0). Target: 10#11
+s_11_10_gotoP0 0 s_11_10_gotoP0 0 L
+s_11_10_gotoP0 1 s_11_10_gotoP0 1 L
+s_11_10_gotoP0 # s_11_10_gotoP0 # L
+s_11_10_gotoP0 1 s_11_10_P0w1 1 L
+s_11_10_P0w1 1 s_11_10_P1w0 1 R
+s_11_10_P1w0 1 s_11_10_P3w1 0 R
+s_11_10_P3w1 # s_11_10_P3w1_sep # R
+s_11_10_P3w1_sep 1 s_11_10_P4w1 1 R
+s_11_10_P4w1 0 qF 1 S

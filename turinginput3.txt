@@ -1,0 +1,38 @@
+[states]
+q0 S
+q1 0
+q2 0
+q_cleanup 0
+qF F
+
+[sigma]
+1
+-
+_
+X
+
+[rules]
+# q0: Scaneaza Dreapta, gaseste '-', schimba in '_', muta Dreapta, la q1
+q0 1 q0 1 R
+q0 - q1 _ R
+
+# q1: In partea B. Scaneaza Dreapta.
+# Daca '1', marcheaza 'X', muta Stanga, la q2.
+# Daca 'X', sare peste, Dreapta, ramane q1.
+# Daca '_', B e gata, muta Stanga, la q_cleanup.
+q1 1 q2 X L
+q1 X q1 X R
+q1 _ q_cleanup _ L
+
+# q2: Scaneaza Stanga. Sare peste 'X', sare peste '_' (separator).
+# Daca '1' (din A), schimba in '_', muta Dreapta, la q1.
+q2 X q2 X L
+q2 _ q2 _ L
+q2 1 q1 _ R
+
+# q_cleanup: B epuizat. Scaneaza Stanga de la capatul lui B.
+# Schimba 'X' in '_'. Trece peste '_' (separator).
+# Cand '1' (rezultat din A) sau '_' (daca m=n) e atins, la qF.
+q_cleanup X q_cleanup _ L
+q_cleanup 1 qF 1 R
+q_cleanup _ qF _ R

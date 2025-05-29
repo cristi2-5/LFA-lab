@@ -1,0 +1,23 @@
+[States]
+q1 q2 q3 q4
+[End]
+
+[Alpha]
+0 1 E
+[End]
+
+[Transitions]
+q1 [0 1] q1
+q1 [1] q2
+q2 [0 E] q3
+q3 [1] q4
+q4 [0 1] q4
+[End]
+
+[Start_point]
+q1
+[End]
+
+[Ending_points]
+q4
+[End]

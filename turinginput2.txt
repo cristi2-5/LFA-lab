@@ -1,0 +1,29 @@
+[states]
+q0 S
+q_sterge 0
+q_final F
+
+[sigma]
+1
+0
++
+_
+
+[rules]
+#! Rule 1: If in q0 and see '1', change to '_', stay in q_sterge, move R
+q0 1 q_sterge _ R
+#! Rule 2: If in q0 and see '0', keep '0', stay in q0, move R
+q0 0 q0 0 R
+#! Rule 3: If in q0 and see '+', keep '+', stay in q0, move R
+q0 + q0 + R
+#! Rule 4: If in q0 and see '_', go to q_final, keep '_', move R (or L, or S - doesn't matter much once final)
+q0 _ q_final _ R
+
+#! Rule 5: If in q_sterge (after deleting a '1') and see '1', change to '_', stay in q_sterge, move R
+q_sterge 1 q_sterge _ R
+#! Rule 6: If in q_sterge and see '0', keep '0', go back to q0 to rescan, move R
+q_sterge 0 q0 0 R
+#! Rule 7: If in q_sterge and see '+', keep '+', go back to q0 to rescan, move R
+q_sterge + q0 + R
+#! Rule 8: If in q_sterge and see '_', go to q_final, keep '_', move R
+q_sterge _ q_final _ R
